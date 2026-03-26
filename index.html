@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 简历优化助手</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#hg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4f46e5"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient></defs><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>AI 简历优化助手</h1>
+      <p class="subtitle">上传你的简历，获取专业的 AI 优化建议</p>
+    </header>
+
+    <!-- API Key 输入区 -->
+    <section class="card">
+      <label for="api-key">DeepSeek API Key</label>
+      <div class="api-key-row">
+        <input type="password" id="api-key" placeholder="输入你的 DeepSeek API Key">
+        <button id="toggle-key" type="button" title="显示/隐藏" aria-label="显示或隐藏 API Key">👁</button>
+      </div>
+      <p class="hint">Key 仅存储在你的浏览器本地，不会上传到任何服务器</p>
+    </section>
+
+    <!-- 文件上传区 -->
+    <section class="card">
+      <label>上传简历</label>
+      <div id="drop-zone" class="drop-zone" tabindex="0" role="button" aria-label="点击或拖拽上传简历文件">
+        <svg class="drop-zone-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <p>拖拽文件到此处，或 <span class="link">点击选择文件</span></p>
+        <p class="hint">支持 PDF / DOCX / MD / TXT 格式</p>
+        <input type="file" id="file-input" accept=".pdf,.docx,.md,.txt" hidden>
+      </div>
+      <div id="file-info" class="file-info" hidden>
+        <span id="file-name"></span>
+        <button id="remove-file" type="button" title="移除文件" aria-label="移除文件">✕</button>
+      </div>
+      <details id="preview-section" hidden>
+        <summary>查看解析内容</summary>
+        <pre id="preview-text"></pre>
+      </details>
+    </section>
+
+    <!-- 用户画像选择区 -->
+    <section class="card profile-section">
+      <label>简历背景</label>
+      <div class="profile-row">
+        <div class="profile-field">
+          <span class="field-label">工作年限</span>
+          <select id="experience-select" aria-label="工作年限">
+            <option value="应届生">应届生</option>
+            <option value="1-3年">1-3年</option>
+            <option value="3-5年">3-5年</option>
+            <option value="5年以上">5年以上</option>
+          </select>
+        </div>
+        <div class="profile-field">
+          <span class="field-label">目标行业</span>
+          <select id="industry-select" aria-label="目标行业">
+            <option value="互联网/科技">互联网/科技</option>
+            <option value="金融/银行">金融/银行</option>
+            <option value="外贸/跨境电商">外贸/跨境电商</option>
+            <option value="教育/培训">教育/培训</option>
+            <option value="制造业/工程">制造业/工程</option>
+            <option value="医疗/生物">医疗/生物</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+      </div>
+      <div id="role-row" class="role-row">
+        <div class="profile-field">
+          <span class="field-label">目标岗位</span>
+          <select id="role-select" aria-label="目标岗位">
+            <option value="产品经理">产品经理</option>
+            <option value="Java开发工程师">Java开发工程师</option>
+            <option value="iOS开发工程师">iOS开发工程师</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+      </div>
+      <div id="custom-role-row" class="custom-industry-row" hidden>
+        <input type="text" id="custom-role" placeholder="请输入岗位名称">
+      </div>
+      <div id="custom-industry-row" class="custom-industry-row" hidden>
+        <input type="text" id="custom-industry" placeholder="请输入行业名称">
+      </div>
+    </section>
+
+    <!-- JD 输入区 -->
+    <section class="card">
+      <label for="jd-input">职位描述（可选）</label>
+      <textarea id="jd-input" class="jd-textarea" rows="5" placeholder="粘贴目标职位的 JD，AI 将额外分析简历与该职位的匹配度"></textarea>
+      <p class="hint">填写后，AI 将额外输出匹配度评分和定向优化建议</p>
+    </section>
+
+    <!-- 操作区 -->
+    <section class="card action-section">
+      <button id="optimize-btn" class="primary-btn" disabled>开始优化</button>
+      <div id="loading" class="loading" hidden>
+        <span class="spinner"></span> AI 正在分析你的简历...
+      </div>
+    </section>
+
+    <!-- 结果展示区 -->
+    <section id="result-section" class="card" hidden>
+      <div class="result-header">
+        <h2>优化建议</h2>
+        <div class="result-actions">
+          <button id="copy-btn" type="button">复制结果</button>
+          <button id="export-btn" type="button">导出 Markdown</button>
+        </div>
+      </div>
+      <div id="result-content" class="result-content" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <!-- CDN 依赖 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
