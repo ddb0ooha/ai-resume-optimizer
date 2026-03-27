@@ -9,7 +9,7 @@
   --color-text: #333;
   --color-text-dark: #1a1a1a;
   --color-text-secondary: #666;
-  --color-hint: #717171;
+  --color-hint: #595959;
   --color-border: #ddd;
   --color-error: #e53e3e;
   --color-success: #38a169;
@@ -20,6 +20,10 @@
   --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.1);
   --radius: 12px;
   --radius-sm: 8px;
+}
+
+[hidden] {
+  display: none !important;
 }
 
 * {
@@ -116,6 +120,11 @@ label {
   transition: border-color 0.2s, background 0.2s;
 }
 
+.drop-zone:focus {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .drop-zone:hover,
 .drop-zone.drag-over {
   border-color: var(--color-primary);
@@ -126,11 +135,6 @@ label {
   color: var(--color-primary);
   text-decoration: underline;
   cursor: pointer;
-}
-
-/* File Info */
-.file-info[hidden] {
-  display: none;
 }
 
 .file-info {
@@ -301,18 +305,37 @@ label {
 }
 
 /* Loading */
-.loading[hidden] {
-  display: none;
-}
-
 .loading {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 10px;
   margin-top: 16px;
   color: var(--color-text-secondary);
   font-size: 14px;
+}
+
+.loading-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#cancel-btn {
+  padding: 6px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-card);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  transition: background 0.2s, color 0.2s;
+}
+
+#cancel-btn:hover {
+  background: var(--color-bg);
+  color: var(--color-error);
+  border-color: var(--color-error);
 }
 
 .spinner {
@@ -404,6 +427,59 @@ label {
   border-radius: 8px;
   overflow-x: auto;
   margin: 12px 0;
+}
+
+.result-content pre code {
+  background: none;
+  padding: 0;
+  font-size: 13px;
+}
+
+.result-content blockquote {
+  border-left: 4px solid var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 12px 16px;
+  margin: 12px 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.result-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 14px;
+}
+
+.result-content th,
+.result-content td {
+  border: 1px solid var(--color-border);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.result-content th {
+  background: var(--color-preview-bg);
+  font-weight: 600;
+}
+
+.result-content tr:nth-child(even) {
+  background: var(--color-preview-bg);
+}
+
+.result-content a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.result-content a:hover {
+  color: var(--color-primary-hover);
+}
+
+.result-content hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 16px 0;
 }
 
 /* Toast */

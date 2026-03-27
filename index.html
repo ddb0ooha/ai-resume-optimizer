@@ -81,10 +81,10 @@
         </div>
       </div>
       <div id="custom-role-row" class="custom-industry-row" hidden>
-        <input type="text" id="custom-role" placeholder="请输入岗位名称">
+        <input type="text" id="custom-role" placeholder="请输入岗位名称" aria-label="自定义岗位">
       </div>
       <div id="custom-industry-row" class="custom-industry-row" hidden>
-        <input type="text" id="custom-industry" placeholder="请输入行业名称">
+        <input type="text" id="custom-industry" placeholder="请输入行业名称" aria-label="自定义行业">
       </div>
     </section>
 
@@ -99,7 +99,11 @@
     <section class="card action-section">
       <button id="optimize-btn" class="primary-btn" disabled>开始优化</button>
       <div id="loading" class="loading" hidden>
-        <span class="spinner"></span> AI 正在分析你的简历...
+        <div class="loading-status">
+          <span class="spinner"></span>
+          <span id="loading-text">AI 正在分析你的简历...</span>
+        </div>
+        <button type="button" id="cancel-btn">取消分析</button>
       </div>
     </section>
 

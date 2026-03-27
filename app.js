@@ -43,7 +43,18 @@ const EXPERIENCE_PROMPTS = {
 };
 
 const INDUSTRY_PROMPTS = {
-  '互联网/科技': '【行业维度】目标行业为互联网/科技。关注技术栈、架构设计、性能优化数据、用户增长指标、敏捷开发经验。',
+  '互联网/科技': `【行业维度】目标行业为互联网/科技。核心评估逻辑：技术能力 + 业务价值 + 数据量化三位一体。
+
+请重点关注：
+1. 技术栈的深度与广度（能否体现架构思维而非仅罗列工具）
+2. 成果量化是否到位：用户侧指标（DAU/MAU/留存率/转化率）、系统侧指标（QPS/P99延迟/可用性SLA）、业务指标（GMV/成本降低比例）
+3. 项目规模感（用户量级、数据规模、团队规模、上线时间）
+4. 迭代与增长思维（A/B测试、灰度发布、数据驱动决策）
+
+互联网简历常见弱点（请在改进建议中重点识别）：
+- 只写"负责了XX功能"，不写"带来了XX结果"
+- 技术描述停留在"使用了XX框架"，没有体现解决了什么问题
+- 缺少与同类项目的规模对比，读者无法判断候选人level`,
   '金融/银行': '【行业维度】目标行业为金融/银行。关注合规经验、风控能力、AUM/业绩指标、专业资质（CFA/CPA等）。',
   '外贸/跨境电商': '【行业维度】目标行业为外贸/跨境电商。关注语言能力、客户开发数量、成交额、市场开拓经验、平台运营数据。',
   '教育/培训': '【行业维度】目标行业为教育/培训。关注教学成果、学生评价、课程开发、教研成果。',
@@ -52,9 +63,66 @@ const INDUSTRY_PROMPTS = {
 };
 
 const ROLE_PROMPTS = {
-  '产品经理': '【岗位维度】目标岗位为产品经理。关注需求分析能力、用户研究方法、数据驱动决策、跨部门协作经验、产品上线成果（DAU/转化率等指标）、原型工具使用。',
-  'Java开发工程师': '【岗位维度】目标岗位为Java开发工程师。关注Java技术栈深度（Spring/MyBatis/微服务等）、系统设计能力、高并发/高可用经验、性能优化案例、代码质量意识。',
-  'iOS开发工程师': '【岗位维度】目标岗位为iOS开发工程师。关注Swift/ObjC技能、UIKit/SwiftUI经验、App Store上线经历、性能调优、架构模式（MVVM/VIPER等）、苹果生态工具链。'
+  '产品经理': `【岗位维度】目标岗位为产品经理。
+
+核心评估维度：
+1. 需求分析能力：能否体现用户研究方法（用户访谈/竞品分析/数据分析），而非仅"收集需求"
+2. 数据驱动决策：是否展示了用数据发现问题、验证方案、复盘结论的完整链路
+3. 商业sense：能否将功能与业务目标挂钩（提升转化、降低成本、拓展新用户）
+4. 跨部门协作：如何推动研发/设计/运营对齐，体现影响力而非单纯协调
+5. 产品交付成果：从0到1上线经历，或从1到N的规模化增长
+
+应引导量化的指标（建议在优化简历中补充）：
+- 用户侧：DAU/MAU增长率、功能渗透率、NPS/满意度评分
+- 效率侧：需求交付周期、需求满足率、迭代速度
+- 业务侧：转化率提升、GMV贡献、新用户占比
+
+产品经理简历常见弱点（请重点识别并给出改进）：
+- 只写"负责XX产品规划"，没有写"基于什么判断做了什么决策，结果如何"
+- 功能罗列代替产品线索，读者看不出候选人的产品思维
+- 缺少规模感（产品用户量、覆盖场景、业务体量）
+
+ATS 关键词参考：需求文档(PRD)、用户故事、原型设计、数据分析、A/B测试、产品路线图、敏捷/Scrum、OKR、商业化、增长策略`,
+  'Java开发工程师': `【岗位维度】目标岗位为Java开发工程师。
+
+核心评估维度：
+1. 技术栈深度：是否体现对框架原理的理解（Spring IoC/AOP原理、JVM调优），而非仅"会用Spring Boot"
+2. 系统设计能力：是否有分布式架构、微服务拆分、数据库设计的实际经验，能否量化系统规模
+3. 性能优化：是否有具体的性能问题诊断和优化案例（优化前后的QPS/延迟/GC情况对比）
+4. 高可用与稳定性：是否涉及限流熔断、缓存策略、消息队列解耦等高可用设计
+5. 工程质量意识：单测覆盖率、Code Review参与、技术方案输出、故障复盘
+
+应引导量化的指标（建议在优化简历中补充）：
+- 系统侧：QPS/TPS、P99响应时间、系统可用率(SLA)、日均请求量
+- 优化侧：性能提升百分比、内存/CPU降低比例、接口响应时间前后对比
+- 规模侧：服务数量、数据量级（日增/存量）、团队规模
+
+Java开发简历常见弱点（请重点识别并给出改进）：
+- 技术栈只是名词堆砌（Spring/Redis/Kafka…），没有说明在项目中如何选型和落地
+- "优化了系统性能"没有前后数据对比，无法判断优化幅度
+- 只写个人模块，看不出对整体架构的理解
+
+ATS 关键词参考：微服务、分布式、高并发、Spring Cloud、消息队列、MySQL调优、缓存、限流熔断、CI/CD、代码审查`,
+  'iOS开发工程师': `【岗位维度】目标岗位为iOS开发工程师。
+
+核心评估维度：
+1. 语言与框架深度：Swift/ObjC的实际使用比例，是否涉及语言特性深度（内存管理/并发/泛型），UIKit与SwiftUI的实战经验
+2. 架构设计能力：是否能清晰描述所用架构模式（MVC/MVVM/VIPER），并解释为何选择该架构
+3. 性能优化：是否有具体的性能问题定位和优化案例（Instruments使用、内存泄漏修复、卡顿优化）
+4. 工程实践：组件化/模块化拆分经验、混编经验、CI/CD接入、自动化测试
+5. 产品与用户意识：是否关注App Store评分、用户反馈、崩溃率等最终产品质量指标
+
+应引导量化的指标（建议在优化简历中补充）：
+- 产品侧：App Store下载量、DAU、评分、Crash率
+- 性能侧：启动时间（冷启动/热启动）优化前后、包体积压缩、内存占用
+- 工程侧：迭代周期、模块数量、单测覆盖率
+
+iOS开发简历常见弱点（请重点识别并给出改进）：
+- 只列技术名词（SwiftUI/Combine/CoreData），没有说明解决了什么实际问题
+- 缺少App上线的实绩数据（用户量、评分），让人无法感知项目量级
+- 架构描述停留在"使用MVVM"，没有说明为何选择和如何落地
+
+ATS 关键词参考：Swift、UIKit、SwiftUI、MVVM、模块化、性能优化、App Store、Xcode、CI/CD、TestFlight、Crash监控`
 };
 
 const JD_PROMPT_ADDON = `
@@ -105,9 +173,12 @@ const customRoleRow = document.getElementById('custom-role-row');
 const customRoleInput = document.getElementById('custom-role');
 const jdInput = document.getElementById('jd-input');
 const exportBtn = document.getElementById('export-btn');
+const cancelBtn = document.getElementById('cancel-btn');
+const loadingText = document.getElementById('loading-text');
 
 let parsedText = '';
 let rawResultText = '';
+let currentController = null;
 
 // 初始化
 function init() {
@@ -185,6 +256,16 @@ function init() {
   // 导出结果
   exportBtn.addEventListener('click', exportResult);
 
+  // 取消分析
+  cancelBtn.addEventListener('click', () => {
+    if (currentController) currentController.abort('cancel');
+  });
+
+  // CDN 库加载检测
+  if (typeof pdfjsLib === 'undefined') showToast('PDF.js 加载失败，PDF 解析不可用');
+  if (typeof mammoth === 'undefined') showToast('Mammoth.js 加载失败，DOCX 解析不可用');
+  if (typeof marked === 'undefined') showToast('Marked.js 加载失败，结果渲染可能异常');
+
   // 初始化 pdf.js worker
   if (typeof pdfjsLib !== 'undefined') {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -206,6 +287,11 @@ async function handleFile(file) {
 
   if (!supported.includes(ext)) {
     showToast('不支持的文件格式，请上传 PDF / DOCX / MD / TXT 文件');
+    return;
+  }
+
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('文件过大，请上传不超过 10MB 的文件');
     return;
   }
 
@@ -278,6 +364,7 @@ async function startOptimize() {
   // UI 状态
   optimizeBtn.disabled = true;
   loading.hidden = false;
+  loadingText.textContent = 'AI 正在分析你的简历...';
   resultSection.hidden = true;
   resultSection.classList.remove('show');
   resultContent.innerHTML = '';
@@ -299,27 +386,46 @@ async function startOptimize() {
       ? `请优化以下简历：\n\n${parsedText}\n\n---\n\n目标职位描述：\n\n${jdText}`
       : `请优化以下简历：\n\n${parsedText}`;
 
-    const response = await fetch('https://api.deepseek.com/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'deepseek-chat',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userContent }
-        ],
-        stream: true,
-        temperature: 0.7,
-        max_tokens: 4096
-      })
-    });
+    const controller = new AbortController();
+    currentController = controller;
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+    let response;
+    try {
+      response = await fetch('https://api.deepseek.com/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userContent }
+          ],
+          stream: true,
+          temperature: 0.7,
+          max_tokens: 8192
+        }),
+        signal: controller.signal
+      });
+    } catch (fetchErr) {
+      clearTimeout(timeoutId);
+      if (fetchErr.name === 'AbortError') {
+        if (controller.signal.reason === 'cancel') throw new Error('__CANCEL__');
+        throw new Error('请求超时，请检查网络后重试');
+      }
+      throw new Error('网络连接失败，请检查网络后重试');
+    }
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       if (response.status === 401) throw new Error('API Key 无效，请检查');
       if (response.status === 429) throw new Error('请求过于频繁，请稍后再试');
+      if (response.status === 500) throw new Error('DeepSeek 服务异常，请稍后重试');
+      if (response.status === 503) throw new Error('DeepSeek 服务暂时不可用，请稍后重试');
       throw new Error(`请求失败 (${response.status})`);
     }
 
@@ -333,39 +439,55 @@ async function startOptimize() {
     const decoder = new TextDecoder();
     let buffer = '';
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop(); // 保留不完整的行
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop(); // 保留不完整的行
 
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed || !trimmed.startsWith('data: ')) continue;
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || !trimmed.startsWith('data: ')) continue;
 
-        const data = trimmed.slice(6);
-        if (data === '[DONE]') break;
+          const data = trimmed.slice(6);
+          if (data === '[DONE]') break;
 
-        try {
-          const json = JSON.parse(data);
-          const delta = json.choices?.[0]?.delta?.content;
-          if (delta) {
-            rawResultText += delta;
-            resultContent.innerHTML = marked.parse(rawResultText);
-            // 自动滚动到底部
-            resultSection.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          try {
+            const json = JSON.parse(data);
+            const delta = json.choices?.[0]?.delta?.content;
+            if (delta) {
+              rawResultText += delta;
+              resultContent.innerHTML = marked.parse(rawResultText);
+              loadingText.textContent = `AI 正在分析...（已接收 ${rawResultText.length} 字）`;
+              resultSection.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+          } catch (e) {
+            // 忽略单行解析错误，继续处理下一行
           }
-        } catch (e) {
-          // 忽略解析错误，继续处理下一行
         }
       }
+    } catch (streamErr) {
+      const isCancelled = controller.signal.aborted && controller.signal.reason === 'cancel';
+      if (rawResultText.trim()) {
+        showToast(isCancelled ? '分析已取消，以下为部分结果' : '接收数据中断，以下为已收到的部分结果');
+      } else {
+        throw new Error(isCancelled ? '__CANCEL__' : '接收数据中断，请重试');
+      }
+    }
+
+    if (!rawResultText.trim()) {
+      throw new Error('未收到 AI 响应内容，请重试');
     }
   } catch (err) {
-    showToast(err.message || '网络连接失败');
+    if (err.message !== '__CANCEL__') {
+      showToast(err.message || '发生未知错误，请重试');
+    }
     loading.hidden = true;
   } finally {
+    currentController = null;
     optimizeBtn.disabled = false;
     loading.hidden = true;
   }
