@@ -1,3 +1,5 @@
+![banner](assets/banner.png)
+
 # AI 简历优化助手
 
 上传简历文件，获取 AI 驱动的专业优化建议。
