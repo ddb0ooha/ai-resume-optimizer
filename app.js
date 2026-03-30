@@ -462,7 +462,8 @@ async function startOptimize() {
               rawResultText += delta;
               resultContent.innerHTML = marked.parse(rawResultText);
               loadingText.textContent = `AI 正在分析...（已接收 ${rawResultText.length} 字）`;
-              resultSection.scrollIntoView({ behavior: 'smooth', block: 'end' });
+              const rp = document.getElementById('right-panel');
+              if (rp) rp.scrollTop = rp.scrollHeight;
             }
           } catch (e) {
             // 忽略单行解析错误，继续处理下一行
