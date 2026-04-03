@@ -1,4 +1,79 @@
 // ============================================================
+// Provider configuration
+// ============================================================
+
+const PROVIDERS = {
+  deepseek: {
+    id: 'deepseek',
+    label: 'DeepSeek',
+    placeholder: 'DeepSeek API Key',
+    storageKey: 'deepseek-api-key',
+    buildFetch(apiKey, systemPrompt, userContent, signal) {
+      return {
+        url: 'https://api.deepseek.com/chat/completions',
+        options: {
+          method: 'POST',
+          signal,
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+          body: JSON.stringify({
+            model: 'deepseek-chat',
+            messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userContent }],
+            stream: true, temperature: 0.7, max_tokens: 8192
+          })
+        }
+      };
+    },
+    extractDelta: (json) => json.choices?.[0]?.delta?.content ?? ''
+  },
+
+  kimi: {
+    id: 'kimi',
+    label: 'Kimi',
+    placeholder: 'Moonshot API Key',
+    storageKey: 'kimi-api-key',
+    buildFetch(apiKey, systemPrompt, userContent, signal) {
+      return {
+        url: 'https://api.moonshot.cn/v1/chat/completions',
+        options: {
+          method: 'POST',
+          signal,
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+          body: JSON.stringify({
+            model: 'moonshot-v1-32k',
+            messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userContent }],
+            stream: true, temperature: 0.7, max_tokens: 8192
+          })
+        }
+      };
+    },
+    extractDelta: (json) => json.choices?.[0]?.delta?.content ?? ''
+  },
+
+  gemini: {
+    id: 'gemini',
+    label: 'Gemini',
+    placeholder: 'Google AI API Key',
+    storageKey: 'gemini-api-key',
+    buildFetch(apiKey, systemPrompt, userContent, signal) {
+      return {
+        url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key=${encodeURIComponent(apiKey)}`,
+        options: {
+          method: 'POST',
+          signal,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: userContent }] }],
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+            generationConfig: { temperature: 0.7, maxOutputTokens: 8192 }
+          })
+        }
+      };
+    },
+    extractDelta: (json) => json.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
+  }
+};
+
+// ============================================================
 // 状态与初始化
 // ============================================================
 
@@ -11,7 +86,7 @@ const BASE_PROMPT = `你是一位资深的人力资源专家和简历优化顾�
 请按以下结构输出你的分析：
 
 ## 总体评价
-对简历的整体质量给出简短评价（2-3句话），并给出1-10的评分。
+对简历的整体质量给出简短评价（2-3句话）。
 
 ## 优点
 列出简历中做得好的地方（3-5条）。
@@ -27,6 +102,15 @@ const BASE_PROMPT = `你是一位资深的人力资源专家和简历优化顾�
 
 ## 额外建议
 针对求职的通用建议（2-3条）。
+
+## 评分总览
+完成以上分析后，严格按照下方格式输出评分（每项为 1-10 的整数，不要添加任何其他文字）：
+总分: X/10
+内容完整度: X/10
+成果量化度: X/10
+结构清晰度: X/10
+表达专业度: X/10
+ATS友好度: X/10
 
 注意事项：
 - 使用 STAR 法则优化工作经历描述
@@ -179,17 +263,97 @@ const loadingText = document.getElementById('loading-text');
 let parsedText = '';
 let rawResultText = '';
 let currentController = null;
+let currentProvider = PROVIDERS.deepseek;
+
+// ============================================================
+// 评分解析与渲染
+// ============================================================
+
+const SCORE_DIMS = [
+  { key: 'completeness',    label: '内容完整度', pattern: /内容完整度[:：]\s*(\d+(?:\.\d+)?)\/10/ },
+  { key: 'quantification',  label: '成果量化度', pattern: /成果量化度[:：]\s*(\d+(?:\.\d+)?)\/10/ },
+  { key: 'structure',       label: '结构清晰度', pattern: /结构清晰度[:：]\s*(\d+(?:\.\d+)?)\/10/ },
+  { key: 'expression',      label: '表达专业度', pattern: /表达专业度[:：]\s*(\d+(?:\.\d+)?)\/10/ },
+  { key: 'ats',             label: 'ATS友好度',  pattern: /ATS友好度[:：]\s*(\d+(?:\.\d+)?)\/10/  }
+];
+
+function parseScores(text) {
+  const scores = {};
+  const totalMatch = text.match(/总分[:：]\s*(\d+(?:\.\d+)?)\/10/);
+  if (totalMatch) scores.total = parseFloat(totalMatch[1]);
+  for (const dim of SCORE_DIMS) {
+    const m = text.match(dim.pattern);
+    if (m) scores[dim.key] = parseFloat(m[1]);
+  }
+  return Object.keys(scores).length >= 4 ? scores : null;
+}
+
+function scoreColorClass(val, prefix) {
+  if (val >= 8) return prefix + 'green';
+  if (val >= 6) return prefix + 'amber';
+  return prefix + 'red';
+}
+
+function renderScoreCard(scores) {
+  const card = document.getElementById('score-card');
+  if (!card || !scores) return;
+
+  const total = scores.total ?? 0;
+  const numEl = document.getElementById('score-number');
+  numEl.textContent = total;
+  numEl.className = 'score-number ' + scoreColorClass(total, 'score-');
+
+  const dimsEl = document.getElementById('score-dims');
+  dimsEl.innerHTML = SCORE_DIMS.map(dim => {
+    const val = scores[dim.key] ?? 0;
+    const barClass = scoreColorClass(val, 'bar-');
+    return `<div class="score-dim">
+      <div class="score-dim-header">
+        <span class="score-dim-label">${dim.label}</span>
+        <span class="score-dim-value">${val}/10</span>
+      </div>
+      <div class="score-bar-bg">
+        <div class="score-bar ${barClass}" style="width:0%" data-target="${val * 10}%"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  card.hidden = false;
+
+  // Trigger bar animations after layout
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      dimsEl.querySelectorAll('.score-bar').forEach(bar => {
+        bar.style.width = bar.dataset.target;
+      });
+    });
+  });
+}
+
+// Strip score section from rendered markdown (shown in visual card instead)
+function stripScoreSection(text) {
+  return text.replace(/\n*##\s*评分总览[\s\S]*$/, '').trim();
+}
 
 // 初始化
 function init() {
-  // 恢复 API Key
-  const savedKey = localStorage.getItem('deepseek-api-key');
-  if (savedKey) apiKeyInput.value = savedKey;
+  // Restore last-used provider and its API key
+  const savedProviderId = localStorage.getItem('current-provider') || 'deepseek';
+  loadProvider(PROVIDERS[savedProviderId] || PROVIDERS.deepseek);
 
-  // API Key 变化时保存
+  // Save key on input
   apiKeyInput.addEventListener('input', () => {
-    localStorage.setItem('deepseek-api-key', apiKeyInput.value.trim());
+    localStorage.setItem(currentProvider.storageKey, apiKeyInput.value.trim());
     updateOptimizeBtn();
+  });
+
+  // Provider pill clicks
+  document.querySelectorAll('.provider-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      localStorage.setItem(currentProvider.storageKey, apiKeyInput.value.trim());
+      localStorage.setItem('current-provider', btn.dataset.provider);
+      loadProvider(PROVIDERS[btn.dataset.provider]);
+    });
   });
 
   // 显示/隐藏 API Key
@@ -273,6 +437,16 @@ function init() {
   }
 }
 
+function loadProvider(provider) {
+  currentProvider = provider;
+  apiKeyInput.placeholder = provider.placeholder;
+  apiKeyInput.value = localStorage.getItem(provider.storageKey) || '';
+  document.querySelectorAll('.provider-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.provider === provider.id);
+  });
+  updateOptimizeBtn();
+}
+
 function updateOptimizeBtn() {
   optimizeBtn.disabled = !(apiKeyInput.value.trim() && parsedText);
 }
@@ -353,7 +527,7 @@ function clearFile() {
 async function startOptimize() {
   const apiKey = apiKeyInput.value.trim();
   if (!apiKey) {
-    showToast('请先输入 DeepSeek API Key');
+    showToast(`请先输入 ${currentProvider.label} API Key`);
     return;
   }
   if (!parsedText) {
@@ -369,6 +543,8 @@ async function startOptimize() {
   resultSection.classList.remove('show');
   resultContent.innerHTML = '';
   rawResultText = '';
+  const scoreCard = document.getElementById('score-card');
+  if (scoreCard) scoreCard.hidden = true;
 
   try {
     // 构建 prompt
@@ -392,24 +568,8 @@ async function startOptimize() {
 
     let response;
     try {
-      response = await fetch('https://api.deepseek.com/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userContent }
-          ],
-          stream: true,
-          temperature: 0.7,
-          max_tokens: 8192
-        }),
-        signal: controller.signal
-      });
+      const { url, options } = currentProvider.buildFetch(apiKey, systemPrompt, userContent, controller.signal);
+      response = await fetch(url, options);
     } catch (fetchErr) {
       clearTimeout(timeoutId);
       if (fetchErr.name === 'AbortError') {
@@ -424,8 +584,8 @@ async function startOptimize() {
     if (!response.ok) {
       if (response.status === 401) throw new Error('API Key 无效，请检查');
       if (response.status === 429) throw new Error('请求过于频繁，请稍后再试');
-      if (response.status === 500) throw new Error('DeepSeek 服务异常，请稍后重试');
-      if (response.status === 503) throw new Error('DeepSeek 服务暂时不可用，请稍后重试');
+      if (response.status === 500) throw new Error(`${currentProvider.label} 服务异常，请稍后重试`);
+      if (response.status === 503) throw new Error(`${currentProvider.label} 服务暂时不可用，请稍后重试`);
       throw new Error(`请求失败 (${response.status})`);
     }
 
@@ -457,10 +617,10 @@ async function startOptimize() {
 
           try {
             const json = JSON.parse(data);
-            const delta = json.choices?.[0]?.delta?.content;
+            const delta = currentProvider.extractDelta(json);
             if (delta) {
               rawResultText += delta;
-              resultContent.innerHTML = marked.parse(rawResultText);
+              resultContent.innerHTML = marked.parse(stripScoreSection(rawResultText));
               loadingText.textContent = `AI 正在分析...（已接收 ${rawResultText.length} 字）`;
               const rp = document.getElementById('right-panel');
               if (rp) rp.scrollTop = rp.scrollHeight;
@@ -482,6 +642,8 @@ async function startOptimize() {
     if (!rawResultText.trim()) {
       throw new Error('未收到 AI 响应内容，请重试');
     }
+
+    renderScoreCard(parseScores(rawResultText));
   } catch (err) {
     if (err.message !== '__CANCEL__') {
       showToast(err.message || '发生未知错误，请重试');

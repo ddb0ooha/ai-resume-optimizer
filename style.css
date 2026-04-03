@@ -136,6 +136,46 @@ body {
 }
 
 /* ============================================================
+   Provider Switcher
+   ============================================================ */
+.provider-switcher {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.provider-pill {
+  padding: 4px 12px;
+  border: none;
+  border-radius: calc(var(--radius-sm) - 2px);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  line-height: 1.6;
+}
+
+.provider-pill:hover:not(.active) {
+  background: var(--color-card);
+  color: var(--color-text);
+}
+
+.provider-pill.active {
+  background: var(--color-card);
+  color: var(--color-primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-xs);
+}
+
+/* ============================================================
    Workspace — flex row, fills remaining height
    ============================================================ */
 .workspace {
@@ -571,6 +611,111 @@ body {
   border-color: var(--color-primary);
   color: var(--color-primary);
   background: var(--color-primary-light);
+}
+
+/* ============================================================
+   Score Card
+   ============================================================ */
+.score-card {
+  margin-bottom: 28px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #f5f3ff 0%, #eff6ff 100%);
+  border: 1px solid #ddd6fe;
+  border-radius: var(--radius);
+  animation: scoreCardIn 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.score-overview {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.score-total-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.score-number {
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -3px;
+}
+
+.score-green { color: #16a34a; }
+.score-amber { color: #d97706; }
+.score-red   { color: #dc2626; }
+
+.score-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.score-meta-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-dark);
+}
+
+.score-meta-max {
+  font-size: 11px;
+  color: var(--color-hint);
+}
+
+.score-dims {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.score-dim {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.score-dim-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.score-dim-label {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.score-dim-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-dark);
+}
+
+.score-bar-bg {
+  height: 5px;
+  background: rgba(0, 0, 0, 0.07);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.score-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bar-green { background: linear-gradient(90deg, #4ade80, #16a34a); }
+.bar-amber { background: linear-gradient(90deg, #fbbf24, #d97706); }
+.bar-red   { background: linear-gradient(90deg, #f87171, #dc2626); }
+
+@keyframes scoreCardIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ============================================================

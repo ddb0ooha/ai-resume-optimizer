@@ -1,0 +1,113 @@
+<svg width="1200" height="400" viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="neon-title" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="50%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+    <linearGradient id="neon-accent" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <filter id="glow-text">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-soft">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <pattern id="dots" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#334155" opacity="0.6"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="400" fill="#060b17"/>
+  <!-- Dot grid -->
+  <rect width="1200" height="400" fill="url(#dots)"/>
+
+  <!-- Ambient glows -->
+  <ellipse cx="220" cy="200" rx="260" ry="180" fill="#3730a3" opacity="0.18" filter="url(#glow-soft)"/>
+  <ellipse cx="980" cy="200" rx="220" ry="160" fill="#6d28d9" opacity="0.15" filter="url(#glow-soft)"/>
+  <ellipse cx="600" cy="400" rx="300" ry="120" fill="#1d4ed8" opacity="0.12" filter="url(#glow-soft)"/>
+
+  <!-- Large ghost "AI" letters -->
+  <text x="60" y="320" font-family="'Arial Black',sans-serif" font-size="340" font-weight="900"
+        fill="#4f46e5" opacity="0.05" letter-spacing="-10">AI</text>
+
+  <!-- Left vertical accent bar -->
+  <rect x="80" y="100" width="3" height="200" fill="url(#neon-accent)" rx="2"/>
+
+  <!-- Top label -->
+  <text x="96" y="130" font-family="'Courier New',monospace" font-size="11" fill="#818cf8" letter-spacing="3">
+    // AI RESUME OPTIMIZER
+  </text>
+
+  <!-- Main title -->
+  <text x="96" y="218" font-family="'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif"
+        font-size="58" font-weight="800" fill="url(#neon-title)" filter="url(#glow-text)"
+        letter-spacing="-1">AI 简历优化助手</text>
+
+  <!-- Tagline -->
+  <text x="96" y="258" font-family="'Courier New',monospace" font-size="14" fill="#64748b" letter-spacing="1">
+    Upload → Parse → Analyze → Score → Optimize
+  </text>
+
+  <!-- Provider section -->
+  <text x="96" y="302" font-family="'Courier New',monospace" font-size="12" fill="#475569">
+    Powered by
+  </text>
+  <!-- DeepSeek badge -->
+  <rect x="176" y="284" width="96" height="26" rx="4" fill="#4f46e5" opacity="0.2"/>
+  <rect x="176" y="284" width="96" height="26" rx="4" fill="none" stroke="#4f46e5" stroke-width="1" opacity="0.4"/>
+  <text x="224" y="301" text-anchor="middle" font-family="'Courier New',monospace" font-size="11"
+        fill="#818cf8">DeepSeek</text>
+  <!-- Kimi badge -->
+  <rect x="280" y="284" width="64" height="26" rx="4" fill="#7c3aed" opacity="0.2"/>
+  <rect x="280" y="284" width="64" height="26" rx="4" fill="none" stroke="#7c3aed" stroke-width="1" opacity="0.4"/>
+  <text x="312" y="301" text-anchor="middle" font-family="'Courier New',monospace" font-size="11"
+        fill="#a78bfa">Kimi</text>
+  <!-- Gemini badge -->
+  <rect x="352" y="284" width="72" height="26" rx="4" fill="#6d28d9" opacity="0.2"/>
+  <rect x="352" y="284" width="72" height="26" rx="4" fill="none" stroke="#6d28d9" stroke-width="1" opacity="0.4"/>
+  <text x="388" y="301" text-anchor="middle" font-family="'Courier New',monospace" font-size="11"
+        fill="#c084fc">Gemini</text>
+
+  <!-- Right side: feature list -->
+  <g transform="translate(780, 120)">
+    <!-- Card bg -->
+    <rect x="0" y="0" width="340" height="190" rx="12"
+          fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+    <rect x="0" y="0" width="340" height="40" rx="12" fill="#1e293b"/>
+    <rect x="0" y="28" width="340" height="12" fill="#1e293b"/>
+    <circle cx="20" cy="20" r="5" fill="#ef4444" opacity="0.8"/>
+    <circle cx="38" cy="20" r="5" fill="#f59e0b" opacity="0.8"/>
+    <circle cx="56" cy="20" r="5" fill="#22c55e" opacity="0.8"/>
+    <text x="170" y="24" text-anchor="middle" font-family="'Courier New',monospace"
+          font-size="11" fill="#475569">resume-analyzer.js</text>
+
+    <!-- Code lines -->
+    <text x="20" y="68" font-family="'Courier New',monospace" font-size="12" fill="#64748b">const</text>
+    <text x="62" y="68" font-family="'Courier New',monospace" font-size="12" fill="#818cf8"> score</text>
+    <text x="110" y="68" font-family="'Courier New',monospace" font-size="12" fill="#64748b"> =</text>
+    <text x="124" y="68" font-family="'Courier New',monospace" font-size="12" fill="#a78bfa"> await</text>
+    <text x="172" y="68" font-family="'Courier New',monospace" font-size="12" fill="#c084fc"> analyze</text>
+    <text x="232" y="68" font-family="'Courier New',monospace" font-size="12" fill="#64748b">(resume)</text>
+
+    <text x="20" y="94" font-family="'Courier New',monospace" font-size="12" fill="#64748b">// 总分</text>
+    <text x="66" y="94" font-family="'Courier New',monospace" font-size="12" fill="#34d399"> 8.5</text>
+    <text x="92" y="94" font-family="'Courier New',monospace" font-size="12" fill="#64748b"> / 10 ✓</text>
+
+    <text x="20" y="120" font-family="'Courier New',monospace" font-size="11" fill="#4ade80">✓</text>
+    <text x="34" y="120" font-family="'Courier New',monospace" font-size="11" fill="#475569"> 内容完整度: </text>
+    <text x="136" y="120" font-family="'Courier New',monospace" font-size="11" fill="#34d399">9/10</text>
+
+    <text x="20" y="140" font-family="'Courier New',monospace" font-size="11" fill="#4ade80">✓</text>
+    <text x="34" y="140" font-family="'Courier New',monospace" font-size="11" fill="#475569"> 成果量化度: </text>
+    <text x="136" y="140" font-family="'Courier New',monospace" font-size="11" fill="#fbbf24">7/10</text>
+
+    <text x="20" y="160" font-family="'Courier New',monospace" font-size="11" fill="#4ade80">✓</text>
+    <text x="34" y="160" font-family="'Courier New',monospace" font-size="11" fill="#475569"> ATS友好度:  </text>
+    <text x="136" y="160" font-family="'Courier New',monospace" font-size="11" fill="#34d399">8/10</text>
+  </g>
+</svg>
