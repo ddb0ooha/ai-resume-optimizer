@@ -77,161 +77,9 @@ const PROVIDERS = {
 // 状态与初始化
 // ============================================================
 
+// Prompts are defined in prompts.js, loaded before this file.
+
 // ============================================================
-// Prompt 模板系统
-// ============================================================
-
-const BASE_PROMPT = `你是一位资深的人力资源专家和简历优化顾问。请对用户提供的简历进行全面分析和优化建议。
-
-请按以下结构输出你的分析：
-
-## 总体评价
-对简历的整体质量给出简短评价（2-3句话）。
-
-## 优点
-列出简历中做得好的地方（3-5条）。
-
-## 需要改进的地方
-列出主要问题，每条包含：
-- 具体问题描述
-- 为什么这是个问题
-- 具体的修改建议
-
-## 优化后的简历
-基于以上分析，给出完整的优化后简历文本。保留原有信息，但改进表达、结构和格式。
-
-## 额外建议
-针对求职的通用建议（2-3条）。
-
-## 评分总览
-完成以上分析后，严格按照下方格式输出评分（每项为 1-10 的整数，不要添加任何其他文字）：
-总分: X/10
-内容完整度: X/10
-成果量化度: X/10
-结构清晰度: X/10
-表达专业度: X/10
-ATS友好度: X/10
-
-注意事项：
-- 使用 STAR 法则优化工作经历描述
-- 量化成果（用数字说话）
-- 确保关键词对 ATS（简历筛选系统）友好
-- 保持简洁，去除冗余信息
-- 输出使用与简历相同的语言`;
-
-const EXPERIENCE_PROMPTS = {
-  '应届生': '【经验维度】该候选人为应届毕业生。重点关注教育背景、实习经历、校园项目、技能证书、社团活动。弱化工作经验要求，强调潜力和学习能力。建议简历控制在1页以内。',
-  '1-3年': '【经验维度】该候选人有1-3年工作经验。重点关注核心技能成长、项目贡献、可量化的工作成果。适度保留教育背景，突出从初级到独当一面的成长轨迹。',
-  '3-5年': '【经验维度】该候选人有3-5年工作经验。重点关注专业深度、独立负责的项目、带来的业务价值。弱化教育背景篇幅，强调行业经验和专业技能。',
-  '5年以上': '【经验维度】该候选人有5年以上工作经验。重点关注战略视角、团队管理、行业影响力、标志性成就。教育背景精简，突出领导力和决策能力。'
-};
-
-const INDUSTRY_PROMPTS = {
-  '互联网/科技': `【行业维度】目标行业为互联网/科技。核心评估逻辑：技术能力 + 业务价值 + 数据量化三位一体。
-
-请重点关注：
-1. 技术栈的深度与广度（能否体现架构思维而非仅罗列工具）
-2. 成果量化是否到位：用户侧指标（DAU/MAU/留存率/转化率）、系统侧指标（QPS/P99延迟/可用性SLA）、业务指标（GMV/成本降低比例）
-3. 项目规模感（用户量级、数据规模、团队规模、上线时间）
-4. 迭代与增长思维（A/B测试、灰度发布、数据驱动决策）
-
-互联网简历常见弱点（请在改进建议中重点识别）：
-- 只写"负责了XX功能"，不写"带来了XX结果"
-- 技术描述停留在"使用了XX框架"，没有体现解决了什么问题
-- 缺少与同类项目的规模对比，读者无法判断候选人level`,
-  '金融/银行': '【行业维度】目标行业为金融/银行。关注合规经验、风控能力、AUM/业绩指标、专业资质（CFA/CPA等）。',
-  '外贸/跨境电商': '【行业维度】目标行业为外贸/跨境电商。关注语言能力、客户开发数量、成交额、市场开拓经验、平台运营数据。',
-  '教育/培训': '【行业维度】目标行业为教育/培训。关注教学成果、学生评价、课程开发、教研成果。',
-  '制造业/工程': '【行业维度】目标行业为制造业/工程。关注项目规模、成本控制、质量指标、安全记录、专业认证。',
-  '医疗/生物': '【行业维度】目标行业为医疗/生物。关注临床/研究经验、论文发表、专利、执业资格。'
-};
-
-const ROLE_PROMPTS = {
-  '产品经理': `【岗位维度】目标岗位为产品经理。
-
-核心评估维度：
-1. 需求分析能力：能否体现用户研究方法（用户访谈/竞品分析/数据分析），而非仅"收集需求"
-2. 数据驱动决策：是否展示了用数据发现问题、验证方案、复盘结论的完整链路
-3. 商业sense：能否将功能与业务目标挂钩（提升转化、降低成本、拓展新用户）
-4. 跨部门协作：如何推动研发/设计/运营对齐，体现影响力而非单纯协调
-5. 产品交付成果：从0到1上线经历，或从1到N的规模化增长
-
-应引导量化的指标（建议在优化简历中补充）：
-- 用户侧：DAU/MAU增长率、功能渗透率、NPS/满意度评分
-- 效率侧：需求交付周期、需求满足率、迭代速度
-- 业务侧：转化率提升、GMV贡献、新用户占比
-
-产品经理简历常见弱点（请重点识别并给出改进）：
-- 只写"负责XX产品规划"，没有写"基于什么判断做了什么决策，结果如何"
-- 功能罗列代替产品线索，读者看不出候选人的产品思维
-- 缺少规模感（产品用户量、覆盖场景、业务体量）
-
-ATS 关键词参考：需求文档(PRD)、用户故事、原型设计、数据分析、A/B测试、产品路线图、敏捷/Scrum、OKR、商业化、增长策略`,
-  'Java开发工程师': `【岗位维度】目标岗位为Java开发工程师。
-
-核心评估维度：
-1. 技术栈深度：是否体现对框架原理的理解（Spring IoC/AOP原理、JVM调优），而非仅"会用Spring Boot"
-2. 系统设计能力：是否有分布式架构、微服务拆分、数据库设计的实际经验，能否量化系统规模
-3. 性能优化：是否有具体的性能问题诊断和优化案例（优化前后的QPS/延迟/GC情况对比）
-4. 高可用与稳定性：是否涉及限流熔断、缓存策略、消息队列解耦等高可用设计
-5. 工程质量意识：单测覆盖率、Code Review参与、技术方案输出、故障复盘
-
-应引导量化的指标（建议在优化简历中补充）：
-- 系统侧：QPS/TPS、P99响应时间、系统可用率(SLA)、日均请求量
-- 优化侧：性能提升百分比、内存/CPU降低比例、接口响应时间前后对比
-- 规模侧：服务数量、数据量级（日增/存量）、团队规模
-
-Java开发简历常见弱点（请重点识别并给出改进）：
-- 技术栈只是名词堆砌（Spring/Redis/Kafka…），没有说明在项目中如何选型和落地
-- "优化了系统性能"没有前后数据对比，无法判断优化幅度
-- 只写个人模块，看不出对整体架构的理解
-
-ATS 关键词参考：微服务、分布式、高并发、Spring Cloud、消息队列、MySQL调优、缓存、限流熔断、CI/CD、代码审查`,
-  'iOS开发工程师': `【岗位维度】目标岗位为iOS开发工程师。
-
-核心评估维度：
-1. 语言与框架深度：Swift/ObjC的实际使用比例，是否涉及语言特性深度（内存管理/并发/泛型），UIKit与SwiftUI的实战经验
-2. 架构设计能力：是否能清晰描述所用架构模式（MVC/MVVM/VIPER），并解释为何选择该架构
-3. 性能优化：是否有具体的性能问题定位和优化案例（Instruments使用、内存泄漏修复、卡顿优化）
-4. 工程实践：组件化/模块化拆分经验、混编经验、CI/CD接入、自动化测试
-5. 产品与用户意识：是否关注App Store评分、用户反馈、崩溃率等最终产品质量指标
-
-应引导量化的指标（建议在优化简历中补充）：
-- 产品侧：App Store下载量、DAU、评分、Crash率
-- 性能侧：启动时间（冷启动/热启动）优化前后、包体积压缩、内存占用
-- 工程侧：迭代周期、模块数量、单测覆盖率
-
-iOS开发简历常见弱点（请重点识别并给出改进）：
-- 只列技术名词（SwiftUI/Combine/CoreData），没有说明解决了什么实际问题
-- 缺少App上线的实绩数据（用户量、评分），让人无法感知项目量级
-- 架构描述停留在"使用MVVM"，没有说明为何选择和如何落地
-
-ATS 关键词参考：Swift、UIKit、SwiftUI、MVVM、模块化、性能优化、App Store、Xcode、CI/CD、TestFlight、Crash监控`
-};
-
-const JD_PROMPT_ADDON = `
-
-用户同时提供了目标职位描述（JD），请在原有分析基础上增加以下内容：
-
-## JD 匹配度分析
-- 匹配度评分（1-10）及简要理由
-- 简历中与 JD 匹配的关键技能/经验（逐条列出）
-- JD 要求但简历中缺失或薄弱的部分（逐条列出）
-- 针对该职位的定向优化建议（3-5条）`;
-
-function buildSystemPrompt(experience, industry, role) {
-  const expPart = EXPERIENCE_PROMPTS[experience] || '';
-  const indPart = INDUSTRY_PROMPTS[industry]
-    || `【行业维度】目标行业为${industry}。请根据该行业的特点，判断关键评价标准并给出针对性建议。`;
-  let prompt = BASE_PROMPT + '\n\n' + expPart + '\n\n' + indPart;
-  if (role) {
-    const rolePart = ROLE_PROMPTS[role]
-      || `【岗位维度】目标岗位为${role}。请根据该岗位的特点，判断关键评价标准并给出针对性建议。`;
-    prompt += '\n\n' + rolePart;
-  }
-  return prompt;
-}
-
 // DOM 引用
 const apiKeyInput = document.getElementById('api-key');
 const toggleKeyBtn = document.getElementById('toggle-key');
@@ -259,6 +107,10 @@ const jdInput = document.getElementById('jd-input');
 const exportBtn = document.getElementById('export-btn');
 const cancelBtn = document.getElementById('cancel-btn');
 const loadingText = document.getElementById('loading-text');
+const resumeEditorSection = document.getElementById('resume-editor-section');
+const resumeEditor = document.getElementById('resume-editor');
+const copyResumeBtn = document.getElementById('copy-resume-btn');
+const generateVisualBtn = document.getElementById('generate-visual-btn');
 
 let parsedText = '';
 let rawResultText = '';
@@ -333,6 +185,43 @@ function renderScoreCard(scores) {
 // Strip score section from rendered markdown (shown in visual card instead)
 function stripScoreSection(text) {
   return text.replace(/\n*##\s*评分总览[\s\S]*$/, '').trim();
+}
+
+// Extract "优化后的简历" into a separate editable block; return the rest as analysis
+function splitResultSections(text) {
+  const noScore = stripScoreSection(text);
+
+  const startMatch = noScore.match(/\n##\s*优化后的简历\s*\n/);
+  if (!startMatch) return { analysis: noScore, resume: null };
+
+  const contentStart = startMatch.index + startMatch[0].length;
+  const afterHeading = noScore.slice(contentStart);
+
+  // Locate next analysis section boundary; do not stop at ## inside resume content
+  const endMatch = afterHeading.match(/\n##\s*额外建议/);
+  const resumeContent = (endMatch ? afterHeading.slice(0, endMatch.index) : afterHeading).trim();
+
+  const analysis = (
+    noScore.slice(0, startMatch.index) +
+    (endMatch ? afterHeading.slice(endMatch.index) : '')
+  ).trim();
+
+  return { analysis, resume: resumeContent || null };
+}
+
+function renderFinalResult() {
+  const { analysis, resume } = splitResultSections(rawResultText);
+  resultContent.innerHTML = marked.parse(analysis);
+
+  if (resume) {
+    resumeEditor.value = resume;
+    resumeEditorSection.hidden = false;
+    // Auto-size textarea to content
+    resumeEditor.style.height = 'auto';
+    resumeEditor.style.height = resumeEditor.scrollHeight + 'px';
+  }
+
+  renderScoreCard(parseScores(rawResultText));
 }
 
 // 初始化
@@ -424,6 +313,28 @@ function init() {
   cancelBtn.addEventListener('click', () => {
     if (currentController) currentController.abort('cancel');
   });
+
+  // 复制优化简历
+  copyResumeBtn.addEventListener('click', () => {
+    const text = resumeEditor.value;
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('简历已复制到剪贴板', 'success');
+    });
+  });
+
+  // Auto-resize resume editor on input
+  resumeEditor.addEventListener('input', () => {
+    resumeEditor.style.height = 'auto';
+    resumeEditor.style.height = resumeEditor.scrollHeight + 'px';
+  });
+
+  // Generate visual resume
+  generateVisualBtn.addEventListener('click', () => {
+    openResumeForm(resumeEditor.value);
+  });
+
+  initResumeForm();
 
   // CDN 库加载检测
   if (typeof pdfjsLib === 'undefined') showToast('PDF.js 加载失败，PDF 解析不可用');
@@ -543,6 +454,8 @@ async function startOptimize() {
   resultSection.classList.remove('show');
   resultContent.innerHTML = '';
   rawResultText = '';
+  resumeEditorSection.hidden = true;
+  resumeEditor.value = '';
   const scoreCard = document.getElementById('score-card');
   if (scoreCard) scoreCard.hidden = true;
 
@@ -643,7 +556,7 @@ async function startOptimize() {
       throw new Error('未收到 AI 响应内容，请重试');
     }
 
-    renderScoreCard(parseScores(rawResultText));
+    renderFinalResult();
   } catch (err) {
     if (err.message !== '__CANCEL__') {
       showToast(err.message || '发生未知错误，请重试');

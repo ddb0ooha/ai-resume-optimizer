@@ -179,6 +179,28 @@
             </div>
           </div>
           <div id="result-content" class="result-content" aria-live="polite"></div>
+
+          <!-- Editable Resume Section -->
+          <div id="resume-editor-section" class="resume-editor-section" hidden>
+            <div class="resume-editor-header">
+              <div class="resume-editor-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <span>优化后的简历</span>
+              </div>
+              <div class="resume-editor-actions">
+                <span class="edit-hint">可直接点击编辑</span>
+                <button id="generate-visual-btn" type="button">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                  生成可视化简历
+                </button>
+                <button id="copy-resume-btn" type="button">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  复制简历
+                </button>
+              </div>
+            </div>
+            <textarea id="resume-editor" class="resume-editor" spellcheck="false" aria-label="优化后的简历，可直接编辑"></textarea>
+          </div>
         </section>
 
         <!-- Empty State — hidden via CSS when result-section is visible -->
@@ -205,6 +227,134 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <!-- Resume Visual Form Modal -->
+  <div id="resume-form-overlay" class="resume-form-overlay" hidden>
+    <div id="resume-form-modal" class="resume-form-modal" role="dialog" aria-modal="true" aria-label="生成可视化简历">
+
+      <div class="rfm-header">
+        <h3 class="rfm-title">生成可视化简历</h3>
+        <span class="rfm-hint">已从文本自动解析，可直接修改</span>
+        <button type="button" class="rfm-close-btn" onclick="closeResumeForm()" aria-label="关闭">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="rfm-body">
+
+        <!-- 基本信息 -->
+        <div class="rf-section">
+          <div class="rf-section-title">基本信息</div>
+          <div class="rf-form-row">
+            <div class="rf-field">
+              <label class="rf-label">姓名</label>
+              <input type="text" id="rf-name" placeholder="你的姓名">
+            </div>
+            <div class="rf-field">
+              <label class="rf-label">经验标语</label>
+              <input type="text" id="rf-experience" placeholder="如：9年工作经验">
+            </div>
+          </div>
+          <div class="rf-form-row">
+            <div class="rf-field">
+              <label class="rf-label">职位（中文）</label>
+              <input type="text" id="rf-title" placeholder="如：产品经理">
+            </div>
+            <div class="rf-field">
+              <label class="rf-label">职位（英文，可选）</label>
+              <input type="text" id="rf-title-en" placeholder="如：Product Manager">
+            </div>
+          </div>
+        </div>
+
+        <!-- 头像 -->
+        <div class="rf-section">
+          <div class="rf-section-title">头像 <span class="rf-optional">可选</span></div>
+          <div class="rf-avatar-row">
+            <img id="rf-avatar-preview" class="rf-avatar-preview" src="" alt="头像预览" hidden>
+            <label class="rf-upload-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              上传头像
+              <input type="file" accept="image/*" hidden onchange="handleAvatarUpload(this)">
+            </label>
+            <span class="rf-upload-hint">不上传则不显示头像区域</span>
+          </div>
+        </div>
+
+        <!-- 联系方式 -->
+        <div class="rf-section">
+          <div class="rf-section-title">联系方式 <span class="rf-optional">最多 3 条</span></div>
+          <div id="rf-contacts-list"></div>
+          <button type="button" class="rf-add-btn" onclick="addContactRow()">+ 添加联系方式</button>
+        </div>
+
+        <!-- 个人总结 -->
+        <div class="rf-section">
+          <div class="rf-section-title">个人总结</div>
+          <textarea id="rf-summary" class="rf-textarea" rows="4" placeholder="个人总结内容"></textarea>
+        </div>
+
+        <!-- 工作经历 -->
+        <div class="rf-section">
+          <div class="rf-section-title">工作经历</div>
+          <div id="rf-jobs-list"></div>
+          <button type="button" class="rf-add-btn" onclick="addJobBlock()">+ 添加工作经历</button>
+        </div>
+
+        <!-- 技能 -->
+        <div class="rf-section">
+          <div class="rf-section-title">技能</div>
+          <div id="rf-skills-list"></div>
+          <button type="button" class="rf-add-btn" onclick="addSkillGroupBlock()">+ 添加技能分组</button>
+        </div>
+
+        <!-- 项目 -->
+        <div class="rf-section">
+          <div class="rf-section-title">开源 / 项目 <span class="rf-optional">可选，为空则不显示该栏</span></div>
+          <div id="rf-projects-list"></div>
+          <button type="button" class="rf-add-btn" onclick="addProjectBlock()">+ 添加项目</button>
+        </div>
+
+        <!-- 教育背景 -->
+        <div class="rf-section">
+          <div class="rf-section-title">教育背景</div>
+          <div class="rf-form-row">
+            <div class="rf-field">
+              <label class="rf-label">学校</label>
+              <input type="text" id="rf-edu-school" placeholder="如：湖北大学">
+            </div>
+            <div class="rf-field">
+              <label class="rf-label">时间 / 备注</label>
+              <input type="text" id="rf-edu-date" placeholder="如：2012 — 2016">
+            </div>
+          </div>
+          <div class="rf-form-row">
+            <div class="rf-field">
+              <label class="rf-label">学位</label>
+              <input type="text" id="rf-edu-degree" placeholder="如：本科 · Bachelor's">
+            </div>
+            <div class="rf-field">
+              <label class="rf-label">专业</label>
+              <input type="text" id="rf-edu-major" placeholder="如：计算机应用技术">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="rfm-footer">
+        <button type="button" class="rfm-cancel-btn" onclick="closeResumeForm()">取消</button>
+        <button type="button" class="rfm-preview-btn" onclick="previewResume()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          预览简历 →
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="prompts.js"></script>
+  <script src="templates/classic.js"></script>
+  <script src="resume-form.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
